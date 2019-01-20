@@ -199,7 +199,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const functions = require('firebase-functions');
-const { Games, Bets } = require('openhud/api');
+const { Games, Bets } = require('@openhud/api');
 
 
 const app = express()
