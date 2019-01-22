@@ -1,196 +1,210 @@
-const utg = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A5s',
-    'KQs', 'KJs', 'KTs',
-    'QJs', 'QTs',
-    'JTs', 'J9s',
-    'T9s',
-    '98s',
-    'AKo', 'AQo'
-];
+// Based on https://redchippoker.com/infographic-pre-flop-ranges/
+const Button = {
+    Tight: {
+        ThreeBet: new Set([
+            'AA', 'KK',
+            'A5s'
+        ]),
+        CallRaise: new Set([
+            'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+            'AKs', 'AQs', 'AJs', 'ATs',
+            'KQs', 'KJs', 'KTs',
+            'QJs', 'QTs',
+            'JTs',
+            'T9s',
+            '98s',
+            '87s',
+            '76s',
+            'AKo',
+        ]),
+        Open: new Set([
+            'A9s', 'A8s', 'A7s', 'A6s', 'A4s', 'A3s', 'A2s',
+            'K9s', 'K8s', 'K7s', 'K6s', 'K5s', 'K4s', 'K3s', 'K2s',
+            'Q9s', 'Q8s', 'Q7s', 'Q6s', 'Q5s',
+            'J9s', 'J8s', 'J7s',
+            'T8s', 'T7s',
+            '97s', '96s',
+            '86s',
+            '75s',
+            '65s', '64s',
+            '54s', '53s',
+            '43s',
+            'AQo', 'AJo', 'ATo', 'A9o', 'A8o', 'A7o',
+            'KQo', 'KJo', 'KTo', 'K9o',
+            'QJo', 'QTo',
+            'JTo'
+        ])
+    },
+    Loose: {
+        ThreeBet: new Set([
+            'AA', 'KK', 'QQ', 'JJ', 'TT', '99',
+            'AKs', 'AQs', 'AJs', 'ATs', 'A5s', 'A4s', 'A3s', 'A2s',
+            'KQs', 'KJs',
+            'QJs',
+            'JTs',
+            '97s',
+            '75s',
+            'AKo', 'AQo'
+        ]),
+        CallRaise: new Set([
+            '88', '77', '66', '55', '44', '33', '22',
+            'A9s', 'A8s', 'A7s', 'A6s',
+            'KTs', 'K9s',
+            'QTs', 'Q9s',
+            'J9s', 'J8s',
+            'T9s', 'T8s', 'T7s',
+            '98s',
+            '87s', '86s',
+            '76s',
+            '65s', '64s',
+            '54s', '53s',
+            '43s',
+            'AJo', 'ATo',
+            'KQo', 'KJo'
+        ]),
+        Open: new Set([
+            'K8s', 'K7s', 'K6s', 'K5s', 'K4s', 'K3s', 'K2s',
+            'Q8s', 'Q7s', 'Q6s', 'Q5s',
+            'J7s',
+            '96s',
+            'A9o', 'A8o', 'A7o',
+            'KTo', 'K9o',
+            'QJo', 'QTo',
+            'JTo'
+        ])
+    }
+};
 
-const utgPlus1 = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A5s',
-    'KQs', 'KJs', 'KTs',
-    'QJs', 'QTs',
-    'JTs', 'J9s',
-    'T9s',
-    '98s',
-    'AKo', 'AQo'
-];
 
-const utgPlus2 = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A5s', 'A4s',
-    'KQs', 'KJs', 'KTs', 'K9s',
-    'QJs', 'QTs', 'Q9s',
-    'JTs', 'J9s',
-    'T9s',
-    '98s',
-    'AKo', 'AQo', 'AJo'
-];
-
-const lojack = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o', '66o', '55o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-    'KQs', 'KJs', 'KTs', 'K9s',
-    'QJs', 'QTs', 'Q9s',
-    'JTs', 'J9s',
-    'T9s', 'T8s',
-    '98s',
-    '87s',
-    '76s',
-    'AKo', 'AQo', 'AJo',
-    'KQo'
-];
-
-const hijack = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o', '66o', '55o', '44o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-    'KQs', 'KJs', 'KTs', 'K9s',
-    'QJs', 'QTs', 'Q9s',
-    'JTs', 'J9s',
-    'T9s', 'T8s',
-    '98s', '97s',
-    '87s',
-    '76s',
-    '65s',
-    'AKo', 'AQo', 'AJo', 'ATo',
-    'KQo', 'KJo',
-    'QJo'
-];
-
-const cutoff = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o', '66o', '55o', '44o', '33o', '22o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-    'KQs', 'KJs', 'KTs', 'K9s', 'K8s',
-    'QJs', 'QTs', 'Q9s', 'Q8s',
-    'JTs', 'J9s', 'J8s',
-    'T9s', 'T8s',
-    '98s', '97s',
-    '87s', '86s',
-    '76s',
-    '65s',
-    '54s',
-    'AKo', 'AQo', 'AJo', 'ATo',
-    'KQo', 'KJo', 'KTo',
-    'QJo', 'QTo',
-    'JTo'
-];
-
-const button = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o', '66o', '55o', '44o', '33o', '22o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-    'KQs', 'KJs', 'KTs', 'K9s', 'K8s', 'K7s', 'K6s', 'K5s', 'K4s', 'K3s',
-    'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s', 'Q5s',
-    'JTs', 'J9s', 'J8s', 'J7s', 'J6s',
-    'T9s', 'T8s', 'T7s', 'T6s',
-    '98s', '97s', '96s',
-    '87s', '86s', '85s',
-    '76s', '75s',
-    '65s', '64s',
-    '54s',
-    '43s',
-    'AKo', 'AQo', 'AJo', 'ATo', 'A9o', 'A8o', 'A7o', 'A6o', 'A5o', 'A4o', 'A3o', 'A2o',
-    'KQo', 'KJo', 'KTo', 'K9o',
-    'QJo', 'QTo', 'Q9o',
-    'JTo', 'J9o',
-    'T9o'
-];
-
-const sb = [
-    'AAo', 'KKo', 'QQo', 'JJo', 'TTo', '99o', '88o', '77o', '66o', '55o', '44o', '33o', '22o',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-    'KQs', 'KJs', 'KTs', 'K9s', 'K8s', 'K7s', 'K6s', 'K5s', 'K4s', 'K3s', 'K2s',
-    'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s', 'Q5s', 'Q4s',
-    'JTs', 'J9s', 'J8s', 'J7s', 'J6s',
-    'T9s', 'T8s', 'T7s', 'T6s',
-    '98s', '97s', '96s', '95s',
-    '87s', '86s', '85s', '84s',
-    '76s', '75s', '74s',
-    '65s', '64s', '63s',
-    '54s', '53s',
-    '43s',
-    '32s',
-    'AKo', 'AQo', 'AJo', 'ATo', 'A9o', 'A8o', 'A7o', 'A6o', 'A5o', 'A4o', 'A3o', 'A2o',
-    'KQo', 'KJo', 'KTo', 'K9o', 'K8o',
-    'QJo', 'QTo', 'Q9o', 'Q8o',
-    'JTo', 'J9o', 'J8o',
-    'T9o', 'T8o',
-    '98o'
-];
-
-const tables = [utg, utgPlus1, utgPlus2, lojack, hijack, cutoff, button, sb];
+const Cutoff = {
+    Tight: {
+        ThreeBet: new Set([
+            'AA', 'KK',
+            'A5s'
+        ]),
+        CallRaise: new Set([
+            'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+            'AKs', 'AQs', 'AJs', 'ATs',
+            'KQs', 'KJs', 'KTs',
+            'QJs', 'QTs',
+            'JTs',
+            'T9s',
+            '98s',
+            '87s',
+            '76s',
+            'AKo',
+        ]),
+        Open: new Set([
+            'A9s', 'A8s', 'A7s', 'A6s', 'A4s', 'A3s', 'A2s',
+            'K9s', 'K8s', 'K7s',
+            'Q9s',
+            'J9s',
+            'T8s',
+            '97s',
+            '86s',
+            '75s',
+            '65s', '64s',
+            '54s', '53s',
+            '43s',
+            'AQo', 'AJo', 'ATo',
+            'KQo', 'KJo'
+        ])
+    },
+    Loose: {
+        ThreeBet: new Set([
+            'AA', 'KK', 'QQ', 'JJ',
+            'AKs', 'A7s', 'A5s', 'A4s', 'A3s', 'A2s',
+            'T9s',
+            '87s',
+            '54s',
+            'AKo'
+        ]),
+        CallRaise: new Set([
+            'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+            'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A6s',
+            'KQs', 'KJs', 'KTs',
+            'QJs', 'QTs',
+            'JTs',
+            '98s',
+            '76s',
+            'AQo'
+        ]),
+        Open: new Set([
+            'K9s', 'K8s', 'K7s',
+            'Q9s',
+            'J9s',
+            'T8s',
+            '97s',
+            '86s',
+            '75s',
+            '65s', '64s',
+            '53s',
+            '43s',
+            'AJo', 'ATo',
+            'KQo', 'KJo'
+        ])
+    }
+};
 
 //////////////////////////////////////////////////
 
-const numericRanks = {
-    'A': 14,
-    'K': 13,
-    'Q': 12,
-    'J': 11,
-    'T': 10,
-    '9': 9,
-    '8': 8,
-    '7': 7,
-    '6': 6,
-    '5': 5,
-    '4': 4,
-    '3': 3,
-    '2': 2
-};
+const { Games, Bets } = require('@openhud/api');
+const { represent } = require('@openhud/helpers');
 
-const toHandRepresentation = hand => {
-    const card1rank = hand[0][0];
-    const card1suit = hand[0][1];
-    const card2rank = hand[1][0];
-    const card2suit = hand[1][1];
+const generateTip = (game, bb, seats, community) => {
+    const tip = { players: {} };
 
-    const repSuit = (card1suit === card2suit) ? 's' : 'o';
-    const ranks = [card1rank, card2rank];
-    ranks.sort((a, b) => (numericRanks[b] - numericRanks[a]));
+    if (game.type === Games.TexasHoldem && game.bet === Bets.NoLimit) {
+        const players = seats.length;
+        const mySeatId = seats.findIndex(seat => seat.isMe);
+        const btnSeatId = seats.findIndex(seat => seat.isButton);
+    
+        if (players >= 4 && mySeatId !== -1) {
+            const mySeat = seats[mySeatId];
+            const myHand = mySeat.cards;
+            if (myHand.length === 0) {
+                throw {
+                    type: 'https://www.openhud.io/errors/invalid-data',
+                    detail: 'Hero cards are missing'
+                };
+            }
+            const myHandRep = represent({ hand: myHand });
 
-    return `${ranks.join('')}${repSuit}`;
-};
+            const index = (mySeatId - (btnSeatId + 1) + players) % players;
 
-const shouldRaiseImpl = (players, position, handRep) => {
-    const playersBehind = players - position - 1;
+            if (index === players - 1) {
+                let tightAction;
+                if (Button.Tight.ThreeBet.has(myHandRep)) {
+                    tightAction = 'open-raise';
+                } else if (Button.Tight.CallRaise.has(myHandRep)) {
+                    tightAction = 'open-call';
+                } else if (Button.Tight.Open.has(myHandRep)) {
+                    tightAction = 'open-fold';
+                } else {
+                    tightAction = 'fold';
+                }
 
-    if (playersBehind === 0) {
-        return false;
-    } else {
-        const table = tables[tables.length - playersBehind];
-        return table.includes(handRep);
-    }
-};
+                let looseAction;
+                if (Button.Loose.ThreeBet.has(myHandRep)) {
+                    looseAction = 'open-raise';
+                } else if (Button.Loose.CallRaise.has(myHandRep)) {
+                    looseAction = 'open-call';
+                } else if (Button.Loose.Open.has(myHandRep)) {
+                    looseAction = 'open-fold';
+                } else {
+                    looseAction = 'fold';
+                }
 
-const errors = {
-    'https://www.openhud.io/errors/invalid-data': {
-        status: 400,
-        title: 'Invalid Data'
-    }
-};
-
-const shouldRaise = (seats, community, bb = 4) => {
-    // TODO: multiple shoves before you
-    const position = seats.findIndex(seat => seat.isMe);
-    if (position === -1) {
-        return false;
-    }
-
-    const seat = seats[position];
-    const hand = seat.cards;
-    if (hand.length === 0) {
-        throw {
-            type: 'https://www.openhud.io/errors/invalid-data',
-            detail: 'Player cards are missing'
-        };
+                if (tightAction === looseAction) {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} on button.`;
+                } else {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on button.`;
+                }
+            }
+        }
     }
 
-    const handRep = toHandRepresentation(hand);
-
-    return shouldRaiseImpl(seats.length, position, handRep);
+    return tip;
 };
 
 //////////
@@ -199,7 +213,6 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const functions = require('firebase-functions');
-const { Games, Bets } = require('@openhud/api');
 
 
 const app = express()
@@ -210,29 +223,21 @@ app.use(cors({
 app.use(bodyParser.json());
 
 
+const errors = {
+    'https://www.openhud.io/errors/invalid-data': {
+        status: 400,
+        title: 'Invalid Data'
+    }
+};
+
+
 app.post('/', (request, response) => {
     try {
         const { game, bb, seats, community } = request.body;
 
-        if (game.type !== Games.TexasHoldem || game.bet !== Bets.NoLimit) {
-            response.status(200).send({ players: {} });
-            return;
-        }
+        const tip = generateTip(game, bb, seats, community);
 
-        let instruction = 'Fold!';
-        if (shouldRaise(seats, community, bb)) {
-            instruction = 'Raise if no action before you!';
-        }
-
-        const result = { players: {} };
-        seats.forEach(seat => {
-            const { playerName, isMe, isFolded, stack, pot, cards } = seat;
-            if (isMe) {
-                result.players[playerName] = instruction;
-            }
-        });
-
-        response.status(200).send(result);
+        response.status(200).send(tip);
     } catch (e) {
         const error = errors[e.type];
         const result = {
