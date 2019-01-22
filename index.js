@@ -146,6 +146,52 @@ const Cutoff = {
     }
 };
 
+const Early = {
+    Tight: {
+        ThreeBet: new Set([
+            'AA', 'KK',
+            'A5s'
+        ]),
+        CallRaise: new Set([
+            'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+            'AKs', 'AQs', 'AJs', 'ATs',
+            'KQs', 'KJs', 'KTs',
+            'QJs', 'QTs',
+            'JTs',
+            'T9s',
+            '98s',
+            '87s',
+            '76s',
+            'AKo',
+        ]),
+        Open: new Set([
+            'A9s', 'A8s', 'A7s', 'A6s', 'A4s', 'A3s', 'A2s',
+            'AQo'
+        ])
+    },
+    Loose: {
+        ThreeBet: new Set([
+            'AA', 'KK', 'QQ',
+            'AKs', 'A5s', 'A4s', 'A3s', 'A2s',
+            'T9s',
+            '87s',
+            'Ako'
+        ]),
+        CallRaise: new Set([
+            'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+            'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s',
+            'KQs', 'KJs', 'KTs',
+            'QJs', 'QTs',
+            'JTs',
+            '98s',
+            '76s',
+            'AQo'
+        ]),
+        Open: new Set([
+        ])
+    }
+};
+
 //////////////////////////////////////////////////
 
 const { Games, Bets } = require('@openhud/api');
@@ -201,6 +247,15 @@ const generateTip = (game, bb, seats, community) => {
                     tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} on cutoff.`;
                 } else {
                     tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on cutoff.`;
+                }
+            } else if (index > 1) { // Early positions
+                const tightAction = getAction(Early.Tight, myHandRep);
+                const looseAction = getAction(Early.Loose, myHandRep);
+
+                if (tightAction === looseAction) {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} on early positions.`;
+                } else {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on early positions.`;
                 }
             }
         }
