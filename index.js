@@ -17,7 +17,7 @@ const Button = {
             '76s',
             'AKo',
         ]),
-        Open: new Set([
+        OpenFold: new Set([
             'A9s', 'A8s', 'A7s', 'A6s', 'A4s', 'A3s', 'A2s',
             'K9s', 'K8s', 'K7s', 'K6s', 'K5s', 'K4s', 'K3s', 'K2s',
             'Q9s', 'Q8s', 'Q7s', 'Q6s', 'Q5s',
@@ -62,7 +62,7 @@ const Button = {
             'AJo', 'ATo',
             'KQo', 'KJo'
         ]),
-        Open: new Set([
+        OpenFold: new Set([
             'K8s', 'K7s', 'K6s', 'K5s', 'K4s', 'K3s', 'K2s',
             'Q8s', 'Q7s', 'Q6s', 'Q5s',
             'J7s',
@@ -94,7 +94,7 @@ const Cutoff = {
             '76s',
             'AKo',
         ]),
-        Open: new Set([
+        OpenFold: new Set([
             'A9s', 'A8s', 'A7s', 'A6s', 'A4s', 'A3s', 'A2s',
             'K9s', 'K8s', 'K7s',
             'Q9s',
@@ -129,7 +129,7 @@ const Cutoff = {
             '76s',
             'AQo'
         ]),
-        Open: new Set([
+        OpenFold: new Set([
             'K9s', 'K8s', 'K7s',
             'Q9s',
             'J9s',
@@ -164,7 +164,7 @@ const Early = {
             '76s',
             'AKo',
         ]),
-        Open: new Set([
+        OpenFold: new Set([
             'A9s', 'A8s', 'A7s', 'A6s', 'A4s', 'A3s', 'A2s',
             'AQo'
         ])
@@ -186,28 +186,41 @@ const Early = {
             '98s',
             '76s',
             'AQo'
-        ]),
-        Open: new Set([
         ])
     }
 };
 
 const Blinds = {
-    Standard: {
+    VsBet: {
         Tight: {
-            ThreeBet: new Set([
-            ]),
-            CallRaise: new Set([
-            ]),
+            ThreeBet: Early.Tight.ThreeBet,
+            CallRaise: Early.Tight.CallRaise
+        },
+        Loose: {
+            ThreeBet: Early.Loose.ThreeBet,
+            CallRaise: Early.Loose.CallRaise
+        }
+    },
+    VsLimp: {
+        Tight: {
+            ThreeBet: new Set([]),
+            CallRaise: new Set([]),
             Open: new Set([
+                'AA', 'KK', 'QQ', 'JJ', 'TT', '99',
+                'AKs', 'AQs', 'AJs', 'ATs',
+                'KQs', 'KJs',
+                'AKo', 'AQo'
             ])
         },
         Loose: {
-            ThreeBet: new Set([
-            ]),
-            CallRaise: new Set([
-            ]),
+            ThreeBet: new Set([]),
+            CallRaise: new Set([]),
             Open: new Set([
+                'AA', 'KK', 'QQ', 'JJ', 'TT', '99',
+                'AKs', 'AQs', 'AJs', 'ATs', 'A5s', 'A4s', 'A3s', 'A2s',
+                'KQs', 'KJs', 'K8s',
+                '76s',
+                'AKo', 'AQo'
             ])
         }
     },
@@ -244,8 +257,6 @@ const Blinds = {
             'JTo', 'J9o',
             'T9o',
             '98o'
-        ]),
-        Open: new Set([
         ])
     }
 };
@@ -256,12 +267,14 @@ const { Games, Bets } = require('@openhud/api');
 const { represent } = require('@openhud/helpers');
 
 const getAction = (table, handRep) => {
-    if (table.ThreeBet.has(handRep)) {
+    if (table.ThreeBet && table.ThreeBet.has(handRep)) {
         return 'open-raise';
-    } else if (table.CallRaise.has(handRep)) {
+    } else if (table.CallRaise && table.CallRaise.has(handRep)) {
         return 'open-call';
-    } else if (table.Open.has(handRep)) {
+    } else if (table.OpenFold && table.OpenFold.has(handRep)) {
         return 'open-fold';
+    } else if (table.Open && table.Open.has(handRep)) {
+        return 'open';
     } else {
         return 'fold';
     }
@@ -316,16 +329,25 @@ const generateTip = (game, bb, seats, community) => {
                     tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on early positions.`;
                 }
             } else { // Blinds
-                const tightAction = getAction(Blinds.Standard.Tight, myHandRep);
-                const looseAction = getAction(Blinds.Standard.Loose, myHandRep);
+                const vsBetTightAction = getAction(Blinds.VsBet.Tight, myHandRep);
+                const vsBetLooseAction = getAction(Blinds.VsBet.Loose, myHandRep);
+                const vsLimpTightAction = getAction(Blinds.VsLimp.Tight, myHandRep);
+                const vsLimpLooseAction = getAction(Blinds.VsLimp.Loose, myHandRep);
                 const vsSteal = getAction(Blinds.VsSteal, myHandRep);
 
-                if (tightAction === looseAction) {
-                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} on blinds. Against steal attempt, ${vsSteal}.`;
+                if (vsBetTightAction === vsBetLooseAction) {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${vsBetTightAction} on blinds.`;
                 } else {
-                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on blinds. Against steal attempt, ${vsSteal}.`;
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${vsBetTightAction} (tight) or ${vsBetLooseAction} (loose) on blinds.`;
                 }
 
+                if (vsLimpTightAction === vsLimpLooseAction) {
+                    tip.players[mySeat.playerName] += ` Against limpers, ${vsLimpTightAction}.`;
+                } else {
+                    tip.players[mySeat.playerName] += ` Against limpers, ${vsLimpTightAction} (tight) or ${vsLimpLooseAction} (loose).`;
+                }
+
+                tip.players[mySeat.playerName] += ` Against steal attempt, ${vsSteal}.`;
             }
         }
     }
