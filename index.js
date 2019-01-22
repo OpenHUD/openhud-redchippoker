@@ -151,6 +151,18 @@ const Cutoff = {
 const { Games, Bets } = require('@openhud/api');
 const { represent } = require('@openhud/helpers');
 
+const getAction = (table, handRep) => {
+    if (table.ThreeBet.has(handRep)) {
+        return 'open-raise';
+    } else if (table.CallRaise.has(handRep)) {
+        return 'open-call';
+    } else if (table.Open.has(handRep)) {
+        return 'open-fold';
+    } else {
+        return 'fold';
+    }
+};
+
 const generateTip = (game, bb, seats, community) => {
     const tip = { players: {} };
 
@@ -172,33 +184,23 @@ const generateTip = (game, bb, seats, community) => {
 
             const index = (mySeatId - (btnSeatId + 1) + players) % players;
 
-            if (index === players - 1) {
-                let tightAction;
-                if (Button.Tight.ThreeBet.has(myHandRep)) {
-                    tightAction = 'open-raise';
-                } else if (Button.Tight.CallRaise.has(myHandRep)) {
-                    tightAction = 'open-call';
-                } else if (Button.Tight.Open.has(myHandRep)) {
-                    tightAction = 'open-fold';
-                } else {
-                    tightAction = 'fold';
-                }
-
-                let looseAction;
-                if (Button.Loose.ThreeBet.has(myHandRep)) {
-                    looseAction = 'open-raise';
-                } else if (Button.Loose.CallRaise.has(myHandRep)) {
-                    looseAction = 'open-call';
-                } else if (Button.Loose.Open.has(myHandRep)) {
-                    looseAction = 'open-fold';
-                } else {
-                    looseAction = 'fold';
-                }
+            if (index === players - 1) { // Button
+                const tightAction = getAction(Button.Tight, myHandRep);
+                const looseAction = getAction(Button.Loose, myHandRep);
 
                 if (tightAction === looseAction) {
                     tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} on button.`;
                 } else {
                     tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on button.`;
+                }
+            } else if (index === players - 2) { // Cutoff
+                const tightAction = getAction(Cutoff.Tight, myHandRep);
+                const looseAction = getAction(Cutoff.Loose, myHandRep);
+
+                if (tightAction === looseAction) {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} on cutoff.`;
+                } else {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on cutoff.`;
                 }
             }
         }
