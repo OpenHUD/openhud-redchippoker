@@ -192,6 +192,64 @@ const Early = {
     }
 };
 
+const Blinds = {
+    Standard: {
+        Tight: {
+            ThreeBet: new Set([
+            ]),
+            CallRaise: new Set([
+            ]),
+            Open: new Set([
+            ])
+        },
+        Loose: {
+            ThreeBet: new Set([
+            ]),
+            CallRaise: new Set([
+            ]),
+            Open: new Set([
+            ])
+        }
+    },
+    VsSteal: {
+        ThreeBet: new Set([
+            'AA', 'KK', 'QQ', 'JJ', 'TT', '99', '44', '33', '22',
+            'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+            'KQs', 'KJs', 'K7s', 'K6s', 'K5s',
+            'Q9s',
+            'J9s',
+            'T8s',
+            '98s', '97s',
+            '87s', '86s',
+            '76s',
+            '65s',
+            '54s',
+            'AKo', 'AQo', 'AJo',
+            'KQo'
+        ]),
+        CallRaise: new Set([
+            '88', '77', '66',
+            'KTs', 'K9s', 'K8s', 'K4s', 'K3s', 'K2s',
+            'QJs', 'QTs', 'Q8s', 'Q7s', 'Q6s', 'Q5s',
+            'JTs', 'J8s', 'J7s',
+            'T9s', 'T7s',
+            '96s',
+            '75s',
+            '64s',
+            '53s',
+            '43s',
+            'ATo', 'A9o', 'A8o',
+            'KJo', 'KTo', 'K9o',
+            'QJo', 'QTo', 'Q9o',
+            'JTo', 'J9o',
+            'T9o',
+            '98o'
+        ]),
+        Open: new Set([
+        ])
+    }
+};
+
 //////////////////////////////////////////////////
 
 const { Games, Bets } = require('@openhud/api');
@@ -257,6 +315,17 @@ const generateTip = (game, bb, seats, community) => {
                 } else {
                     tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on early positions.`;
                 }
+            } else { // Blinds
+                const tightAction = getAction(Blinds.Standard.Tight, myHandRep);
+                const looseAction = getAction(Blinds.Standard.Loose, myHandRep);
+                const vsSteal = getAction(Blinds.VsSteal, myHandRep);
+
+                if (tightAction === looseAction) {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} on blinds. Against steal attempt, ${vsSteal}.`;
+                } else {
+                    tip.players[mySeat.playerName] = `${myHandRep} should ${tightAction} (tight) or ${looseAction} (loose) on blinds. Against steal attempt, ${vsSteal}.`;
+                }
+
             }
         }
     }
