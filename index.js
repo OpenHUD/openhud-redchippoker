@@ -175,7 +175,7 @@ const Early = {
             'AKs', 'A5s', 'A4s', 'A3s', 'A2s',
             'T9s',
             '87s',
-            'Ako'
+            'AKo'
         ]),
         CallRaise: new Set([
             'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
