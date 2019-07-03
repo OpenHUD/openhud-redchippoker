@@ -1,3 +1,7 @@
+// Based on https://play.google.com/store/apps/details?id=com.app.upswingpoker (onlinecashrange)
+
+
+
 // Based on https://redchippoker.com/infographic-pre-flop-ranges/
 const Button = {
     Tight: {
@@ -365,7 +369,7 @@ const functions = require('firebase-functions');
 
 const app = express()
 app.use(cors({
-    origin: true,
+    origin: '*', // Required to avoid chrome extension CORB error
     maxAge: 86400
 }));
 app.use(bodyParser.json());
